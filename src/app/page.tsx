@@ -393,9 +393,12 @@ const ForgeManufacturing: React.FC = () => {
                 </div>
                 
                 <blockquote className="text-slate-300 leading-relaxed mb-6">
-                  "At Forge, we're not just manufacturing parts—we're engineering the future. 
+                  <p>
+  At Forge, we&apos;re not just manufacturing parts&mdash;we&apos;re engineering the future.
+</p>
+
                   Our AI-driven precision and lightning-fast delivery are revolutionizing how 
-                  industries approach production."
+                 &apos;industries &mdash;approach &apos;production."
                 </blockquote>
                 
                 <div className="flex items-center justify-between text-sm">
