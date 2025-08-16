@@ -2,13 +2,26 @@
 
 import React, { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 
+// Type definitions
+interface CNC3DPartProps {
+  type: 'bracket' | 'cylinder' | 'bearing' | 'connector' | 'default';
+  index?: number;
+}
+
+interface ToolAnimationProps {
+  toolType?: 'mill' | 'drill' | 'lathe';
+  index?: number;
+}
+
 // Enhanced 3D CNC Parts with realistic metallic rendering
-const CNC3DPart = React.memo(({ type, index = 0 }) => {
+const CNC3DPart = React.memo<CNC3DPartProps>(({ type, index = 0 }) => {
   const [rotation, setRotation] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const animate = () => {
-      setRotation(prev => prev + 0.3);
+      setRotation(prev => prev + 0.5);
       requestAnimationFrame(animate);
     };
     const id = requestAnimationFrame(animate);
@@ -16,44 +29,47 @@ const CNC3DPart = React.memo(({ type, index = 0 }) => {
   }, []);
 
   const partStyles = {
-    transform: `rotateY(${rotation + index * 72}deg) rotateX(${Math.sin(rotation * 0.008) * 8}deg) rotateZ(${Math.cos(rotation * 0.006) * 3}deg)`,
-    transformStyle: 'preserve-3d',
+    transform: isClient 
+      ? `rotateY(${rotation + index * 72}deg) rotateX(${Math.sin(rotation * 0.008) * 15}deg) rotateZ(${Math.cos(rotation * 0.006) * 8}deg)`
+      : `rotateY(${index * 72}deg) rotateX(0deg) rotateZ(0deg)`,
+    transformStyle: 'preserve-3d' as const,
     transition: 'none',
-    filter: 'drop-shadow(0 10px 25px rgba(0,0,0,0.3))'
+    filter: 'drop-shadow(0 15px 35px rgba(0,0,0,0.4))'
   };
 
   if (type === 'bracket') {
     return (
-      <div className="relative w-full h-full flex items-center justify-center perspective-1000">
+      <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
         <div 
           style={partStyles}
-          className="w-28 h-32 relative"
+          className="w-32 h-36 relative"
         >
           {/* Main bracket body */}
           <div className="absolute inset-0 bg-gradient-to-br from-gray-200 via-gray-300 to-gray-500 rounded-2xl shadow-2xl border border-gray-400"
                style={{
                  background: 'linear-gradient(135deg, #e5e7eb 0%, #d1d5db 25%, #9ca3af 50%, #6b7280 75%, #4b5563 100%)',
-                 boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.3)'
+                 boxShadow: 'inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -3px 6px rgba(0,0,0,0.3), 0 12px 40px rgba(0,0,0,0.4)'
                }}>
             {/* Central mounting hole */}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-gray-800 rounded-full border-4 border-gray-600"
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-gray-800 rounded-full border-4 border-gray-600"
                  style={{
                    background: 'radial-gradient(circle at 30% 30%, #374151, #1f2937, #000000)',
-                   boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.8)'
+                   boxShadow: 'inset 0 6px 12px rgba(0,0,0,0.9)'
                  }}></div>
             
             {/* Corner bolt holes */}
-            <div className="absolute top-2 left-2 w-3 h-3 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
-            <div className="absolute top-2 right-2 w-3 h-3 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
-            <div className="absolute bottom-2 left-2 w-3 h-3 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
-            <div className="absolute bottom-2 right-2 w-3 h-3 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
+            <div className="absolute top-3 left-3 w-4 h-4 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
+            <div className="absolute top-3 right-3 w-4 h-4 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
+            <div className="absolute bottom-3 left-3 w-4 h-4 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
+            <div className="absolute bottom-3 right-3 w-4 h-4 bg-gray-800 rounded-full shadow-inner border border-gray-600"></div>
             
             {/* Mounting slots */}
-            <div className="absolute top-1/2 left-1 transform -translate-y-1/2 w-2 h-8 bg-gray-700 rounded-full shadow-inner"></div>
-            <div className="absolute top-1/2 right-1 transform -translate-y-1/2 w-2 h-8 bg-gray-700 rounded-full shadow-inner"></div>
+            <div className="absolute top-1/2 left-1 transform -translate-y-1/2 w-3 h-10 bg-gray-700 rounded-full shadow-inner"></div>
+            <div className="absolute top-1/2 right-1 transform -translate-y-1/2 w-3 h-10 bg-gray-700 rounded-full shadow-inner"></div>
             
-            {/* Metallic highlight */}
-            <div className="absolute top-1 left-1 w-6 h-6 bg-white opacity-30 rounded-full blur-sm"></div>
+            {/* Enhanced metallic highlight */}
+            <div className="absolute top-2 left-2 w-8 h-8 bg-white opacity-40 rounded-full blur-sm"></div>
+            <div className="absolute top-6 left-6 w-4 h-4 bg-white opacity-20 rounded-full blur-sm"></div>
           </div>
         </div>
       </div>
@@ -62,41 +78,41 @@ const CNC3DPart = React.memo(({ type, index = 0 }) => {
 
   if (type === 'cylinder') {
     return (
-      <div className="relative w-full h-full flex items-center justify-center perspective-1000">
+      <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
         <div 
           style={partStyles}
-          className="w-20 h-32 relative"
+          className="w-24 h-36 relative"
         >
           {/* Main cylinder body */}
           <div className="absolute inset-0 rounded-full shadow-2xl relative overflow-hidden"
                style={{
                  background: 'linear-gradient(45deg, #f3f4f6 0%, #e5e7eb 15%, #d1d5db 30%, #9ca3af 60%, #6b7280 85%, #4b5563 100%)',
-                 boxShadow: 'inset -4px 0 8px rgba(0,0,0,0.2), inset 4px 0 8px rgba(255,255,255,0.3), 0 8px 32px rgba(0,0,0,0.3)'
+                 boxShadow: 'inset -6px 0 12px rgba(0,0,0,0.3), inset 6px 0 12px rgba(255,255,255,0.4), 0 12px 40px rgba(0,0,0,0.4)'
                }}>
             
             {/* Top cap */}
-            <div className="absolute top-0 left-0 right-0 h-4 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg border-2 border-blue-700"
+            <div className="absolute top-0 left-0 right-0 h-5 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg border-2 border-blue-700"
                  style={{
-                   boxShadow: '0 2px 8px rgba(59, 130, 246, 0.5), inset 0 1px 2px rgba(255,255,255,0.3)'
+                   boxShadow: '0 3px 12px rgba(59, 130, 246, 0.6), inset 0 2px 4px rgba(255,255,255,0.4)'
                  }}></div>
             
             {/* Bottom cap */}
-            <div className="absolute bottom-0 left-0 right-0 h-4 bg-gradient-to-t from-blue-400 to-blue-600 rounded-full shadow-lg border-2 border-blue-700"
+            <div className="absolute bottom-0 left-0 right-0 h-5 bg-gradient-to-t from-blue-400 to-blue-600 rounded-full shadow-lg border-2 border-blue-700"
                  style={{
-                   boxShadow: '0 -2px 8px rgba(59, 130, 246, 0.5), inset 0 -1px 2px rgba(255,255,255,0.3)'
+                   boxShadow: '0 -3px 12px rgba(59, 130, 246, 0.6), inset 0 -2px 4px rgba(255,255,255,0.4)'
                  }}></div>
             
             {/* Central groove */}
-            <div className="absolute top-1/2 left-0 right-0 h-2 bg-gray-600 transform -translate-y-1/2 shadow-inner border-t border-b border-gray-700"></div>
+            <div className="absolute top-1/2 left-0 right-0 h-3 bg-gray-600 transform -translate-y-1/2 shadow-inner border-t border-b border-gray-700"></div>
             
             {/* Surface lines */}
-            {Array.from({ length: 8 }).map((_, i) => (
-              <div key={i} className="absolute left-0 right-0 h-px bg-gray-500 opacity-30"
-                   style={{ top: `${15 + i * 10}%` }}></div>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <div key={i} className="absolute left-0 right-0 h-px bg-gray-500 opacity-40"
+                   style={{ top: `${15 + i * 8}%` }}></div>
             ))}
             
-            {/* Metallic highlight */}
-            <div className="absolute top-2 left-2 w-4 h-8 bg-white opacity-40 rounded-full blur-sm transform rotate-12"></div>
+            {/* Enhanced metallic highlight */}
+            <div className="absolute top-3 left-3 w-6 h-12 bg-white opacity-50 rounded-full blur-sm transform rotate-12"></div>
           </div>
         </div>
       </div>
@@ -105,52 +121,52 @@ const CNC3DPart = React.memo(({ type, index = 0 }) => {
 
   if (type === 'bearing') {
     return (
-      <div className="relative w-full h-full flex items-center justify-center perspective-1000">
+      <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
         <div 
           style={partStyles}
-          className="w-28 h-28 relative"
+          className="w-32 h-32 relative"
         >
           {/* Outer ring */}
           <div className="absolute inset-0 rounded-full shadow-2xl relative"
                style={{
                  background: 'linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 25%, #9ca3af 50%, #6b7280 75%, #374151 100%)',
-                 boxShadow: 'inset 0 4px 8px rgba(255,255,255,0.4), inset 0 -4px 8px rgba(0,0,0,0.3), 0 8px 32px rgba(0,0,0,0.4)'
+                 boxShadow: 'inset 0 6px 12px rgba(255,255,255,0.5), inset 0 -6px 12px rgba(0,0,0,0.4), 0 12px 40px rgba(0,0,0,0.5)'
                }}>
             
             {/* Blue inner race */}
-            <div className="absolute inset-3 rounded-full shadow-inner relative"
+            <div className="absolute inset-4 rounded-full shadow-inner relative"
                  style={{
                    background: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)',
-                   boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.4), 0 2px 8px rgba(59, 130, 246, 0.3)'
+                   boxShadow: 'inset 0 3px 6px rgba(0,0,0,0.5), 0 3px 12px rgba(59, 130, 246, 0.4)'
                  }}>
               
               {/* Inner bearing hole */}
-              <div className="absolute inset-4 rounded-full"
+              <div className="absolute inset-5 rounded-full"
                    style={{
                      background: 'radial-gradient(circle at 30% 30%, #9ca3af, #6b7280, #374151)',
-                     boxShadow: 'inset 0 4px 8px rgba(0,0,0,0.8)'
+                     boxShadow: 'inset 0 6px 12px rgba(0,0,0,0.9)'
                    }}></div>
               
-              {/* Ball bearings simulation */}
-              {Array.from({ length: 8 }).map((_, i) => {
-                const angle = (i * 45) * Math.PI / 180;
-                const x = Math.cos(angle) * 35;
-                const y = Math.sin(angle) * 35;
+              {/* Ball bearings simulation - Fixed positions for hydration */}
+              {Array.from({ length: 12 }).map((_, i) => {
+                const angle = (i * 30) * Math.PI / 180;
+                const x = Math.cos(angle) * 42;
+                const y = Math.sin(angle) * 42;
                 return (
-                  <div key={i} className="absolute w-2 h-2 bg-gray-300 rounded-full shadow-sm border border-gray-400"
+                  <div key={i} className="absolute w-3 h-3 bg-gray-300 rounded-full shadow-sm border border-gray-400"
                        style={{
                          left: '50%',
                          top: '50%',
-                         transform: `translate(${x - 4}px, ${y - 4}px)`,
+                         transform: `translate(${Math.round(x * 100) / 100 - 6}px, ${Math.round(y * 100) / 100 - 6}px)`,
                          background: 'radial-gradient(circle at 30% 30%, #f3f4f6, #d1d5db)'
                        }}></div>
                 );
               })}
             </div>
             
-            {/* Metallic highlights */}
-            <div className="absolute top-2 left-2 w-8 h-8 bg-white opacity-30 rounded-full blur-sm"></div>
-            <div className="absolute bottom-3 right-3 w-4 h-4 bg-white opacity-20 rounded-full blur-sm"></div>
+            {/* Enhanced metallic highlights */}
+            <div className="absolute top-3 left-3 w-10 h-10 bg-white opacity-40 rounded-full blur-sm"></div>
+            <div className="absolute bottom-4 right-4 w-6 h-6 bg-white opacity-25 rounded-full blur-sm"></div>
           </div>
         </div>
       </div>
@@ -159,32 +175,32 @@ const CNC3DPart = React.memo(({ type, index = 0 }) => {
 
   if (type === 'connector') {
     return (
-      <div className="relative w-full h-full flex items-center justify-center perspective-1000">
+      <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
         <div 
           style={partStyles}
-          className="w-24 h-28 relative"
+          className="w-28 h-32 relative"
         >
           {/* Main connector body */}
           <div className="absolute inset-0 rounded-2xl shadow-2xl relative overflow-hidden"
                style={{
                  background: 'linear-gradient(135deg, #f3f4f6 0%, #d1d5db 30%, #6b7280 70%, #374151 100%)',
-                 boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.3)'
+                 boxShadow: 'inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -3px 6px rgba(0,0,0,0.3), 0 12px 40px rgba(0,0,0,0.4)'
                }}>
             
             {/* Top connector part */}
-            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-8 h-8 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg border-2 border-blue-700"></div>
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-10 h-10 bg-gradient-to-b from-blue-400 to-blue-600 rounded-full shadow-lg border-2 border-blue-700"></div>
             
             {/* Central shaft */}
-            <div className="absolute top-6 left-1/2 transform -translate-x-1/2 w-4 h-16 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full shadow-inner"></div>
+            <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-5 h-18 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full shadow-inner"></div>
             
             {/* Threading simulation */}
-            {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="absolute left-1/2 transform -translate-x-1/2 w-5 h-1 bg-gray-600"
-                   style={{ top: `${30 + i * 8}%` }}></div>
+            {Array.from({ length: 8 }).map((_, i) => (
+              <div key={i} className="absolute left-1/2 transform -translate-x-1/2 w-6 h-1 bg-gray-600"
+                   style={{ top: `${30 + i * 6}%` }}></div>
             ))}
             
-            {/* Metallic highlight */}
-            <div className="absolute top-1 left-1 w-6 h-6 bg-white opacity-40 rounded-full blur-sm"></div>
+            {/* Enhanced metallic highlight */}
+            <div className="absolute top-2 left-2 w-8 h-8 bg-white opacity-50 rounded-full blur-sm"></div>
           </div>
         </div>
       </div>
@@ -193,29 +209,33 @@ const CNC3DPart = React.memo(({ type, index = 0 }) => {
 
   // Default part
   return (
-    <div className="relative w-full h-full flex items-center justify-center perspective-1000">
+    <div className="relative w-full h-full flex items-center justify-center" style={{ perspective: '1000px' }}>
       <div 
         style={partStyles}
-        className="w-24 h-24 relative"
+        className="w-28 h-28 relative"
       >
         <div className="absolute inset-0 rounded-2xl shadow-2xl"
              style={{
                background: 'linear-gradient(135deg, #e5e7eb 0%, #9ca3af 50%, #4b5563 100%)',
-               boxShadow: 'inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.2), 0 8px 32px rgba(0,0,0,0.3)'
+               boxShadow: 'inset 0 3px 6px rgba(255,255,255,0.4), inset 0 -3px 6px rgba(0,0,0,0.3), 0 12px 40px rgba(0,0,0,0.4)'
              }}>
-          <div className="absolute top-1 left-1 w-6 h-6 bg-white opacity-30 rounded-full blur-sm"></div>
+          <div className="absolute top-2 left-2 w-8 h-8 bg-white opacity-40 rounded-full blur-sm"></div>
         </div>
       </div>
     </div>
   );
 });
 
+CNC3DPart.displayName = 'CNC3DPart';
+
 // Manufacturing animation component
 const ManufacturingAnimation = React.memo(() => {
   const [toolPosition, setToolPosition] = useState(0);
   const [workpieceRotation, setWorkpieceRotation] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const animate = () => {
       setToolPosition(prev => prev + 1);
       setWorkpieceRotation(prev => prev + 2);
@@ -234,7 +254,9 @@ const ManufacturingAnimation = React.memo(() => {
       <div 
         className="absolute bottom-12 left-1/2 transform -translate-x-1/2 w-12 h-16 bg-gradient-to-b from-gray-400 to-gray-600 rounded-full shadow-lg"
         style={{
-          transform: `translateX(-50%) rotateZ(${workpieceRotation}deg)`,
+          transform: isClient 
+            ? `translateX(-50%) rotateZ(${workpieceRotation}deg)`
+            : 'translateX(-50%) rotateZ(0deg)',
           transformOrigin: 'center bottom'
         }}
       >
@@ -245,7 +267,9 @@ const ManufacturingAnimation = React.memo(() => {
       <div 
         className="absolute top-8 w-3 h-12 bg-gray-800 shadow-lg"
         style={{
-          left: `${50 + Math.sin(toolPosition * 0.05) * 20}%`,
+          left: isClient 
+            ? `${50 + Math.sin(toolPosition * 0.05) * 20}%`
+            : '50%',
           transform: 'translateX(-50%)',
           clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)'
         }}
@@ -255,7 +279,7 @@ const ManufacturingAnimation = React.memo(() => {
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-6 h-8 bg-green-600 rounded-lg shadow-lg"></div>
 
       {/* Sparks effect */}
-      {Array.from({ length: 3 }).map((_, i) => (
+      {isClient && Array.from({ length: 3 }).map((_, i) => (
         <div
           key={i}
           className="absolute w-1 h-1 bg-yellow-400 rounded-full animate-ping"
@@ -270,11 +294,15 @@ const ManufacturingAnimation = React.memo(() => {
   );
 });
 
+ManufacturingAnimation.displayName = 'ManufacturingAnimation';
+
 // Tool animation component
-const ToolAnimation = React.memo(({ toolType = 'mill', index = 0 }) => {
+const ToolAnimation = React.memo<ToolAnimationProps>(({ toolType = 'mill', index = 0 }) => {
   const [rotation, setRotation] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const animate = () => {
       setRotation(prev => prev + (2 + index));
       requestAnimationFrame(animate);
@@ -284,8 +312,10 @@ const ToolAnimation = React.memo(({ toolType = 'mill', index = 0 }) => {
   }, [index]);
 
   const toolStyle = {
-    transform: `rotateY(${rotation}deg) rotateX(${Math.sin(rotation * 0.02) * 15}deg)`,
-    transformStyle: 'preserve-3d'
+    transform: isClient 
+      ? `rotateY(${rotation}deg) rotateX(${Math.sin(rotation * 0.02) * 15}deg)`
+      : 'rotateY(0deg) rotateX(0deg)',
+    transformStyle: 'preserve-3d' as const
   };
 
   if (toolType === 'drill') {
@@ -324,11 +354,15 @@ const ToolAnimation = React.memo(({ toolType = 'mill', index = 0 }) => {
   );
 });
 
+ToolAnimation.displayName = 'ToolAnimation';
+
 // About section 3D component
 const AboutSection3D = React.memo(() => {
   const [rotation, setRotation] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const animate = () => {
       setRotation(prev => prev + 0.8);
       requestAnimationFrame(animate);
@@ -342,8 +376,10 @@ const AboutSection3D = React.memo(() => {
       <div 
         className="relative w-20 h-20"
         style={{
-          transform: `rotateY(${rotation}deg) rotateX(${Math.sin(rotation * 0.01) * 10}deg)`,
-          transformStyle: 'preserve-3d'
+          transform: isClient 
+            ? `rotateY(${rotation}deg) rotateX(${Math.sin(rotation * 0.01) * 10}deg)`
+            : 'rotateY(0deg) rotateX(0deg)',
+          transformStyle: 'preserve-3d' as const
         }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-gray-400 to-gray-600 rounded-lg shadow-lg"></div>
@@ -368,11 +404,15 @@ const AboutSection3D = React.memo(() => {
   );
 });
 
+AboutSection3D.displayName = 'AboutSection3D';
+
 // Product part component
 const ProductPart = React.memo(() => {
   const [rotation, setRotation] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const animate = () => {
       setRotation(prev => prev + 1);
       requestAnimationFrame(animate);
@@ -386,8 +426,8 @@ const ProductPart = React.memo(() => {
       <div 
         className="relative"
         style={{
-          transform: `rotateY(${rotation}deg)`,
-          transformStyle: 'preserve-3d'
+          transform: isClient ? `rotateY(${rotation}deg)` : 'rotateY(0deg)',
+          transformStyle: 'preserve-3d' as const
         }}
       >
         <div className="w-16 h-20 bg-gradient-to-b from-gray-300 to-gray-500 rounded-full shadow-lg relative">
@@ -398,6 +438,8 @@ const ProductPart = React.memo(() => {
     </div>
   );
 });
+
+ProductPart.displayName = 'ProductPart';
 
 // Loading Screen
 const LoadingScreen = React.memo(() => (
@@ -411,11 +453,15 @@ const LoadingScreen = React.memo(() => (
   </div>
 ));
 
-const ForgeManufacturingV2 = () => {
+LoadingScreen.displayName = 'LoadingScreen';
+
+const ForgeManufacturingV2: React.FC = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [scrollY, setScrollY] = useState(0);
+  const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
+    setIsClient(true);
     const timer = setTimeout(() => setIsLoaded(true), 2000);
     return () => clearTimeout(timer);
   }, []);
@@ -437,7 +483,8 @@ const ForgeManufacturingV2 = () => {
     input.type = 'file';
     input.accept = '.step,.stp,.iges,.igs,.dwg,.dxf';
     input.onchange = (e) => {
-      const file = e.target.files[0];
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
       if (file) {
         alert(`File selected: ${file.name}\nThis would normally upload to your manufacturing system.`);
       }
@@ -445,7 +492,7 @@ const ForgeManufacturingV2 = () => {
     input.click();
   }, []);
 
-  const scrollToSection = useCallback((sectionId) => {
+  const scrollToSection = useCallback((sectionId: string) => {
     const element = document.getElementById(sectionId);
     if (element) {
       element.scrollIntoView({ 
@@ -516,63 +563,93 @@ const ForgeManufacturingV2 = () => {
 
       {/* Main Content */}
       <main className="pt-20">
-        {/* Hero Section */}
+        {/* Hero Section with Enhanced 3D */}
         <section className="relative min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 overflow-hidden">
-          {/* Enhanced 3D Parts Background */}
+          {/* Main 3D Parts Background - Much More Prominent */}
           <div 
-            className="absolute inset-0 flex items-center justify-center opacity-40"
+            className="absolute inset-0 flex items-center justify-center opacity-60"
             style={{ 
-              transform: `translateY(${scrollY * 0.2}px) translateX(${Math.sin(scrollY * 0.005) * 20}px)`,
-              perspective: '1000px'
+              transform: isClient 
+                ? `translateY(${scrollY * 0.3}px) translateX(${Math.sin(scrollY * 0.005) * 30}px)`
+                : 'translateY(0px) translateX(0px)',
+              perspective: '1200px'
             }}
           >
-            <div className="flex space-x-12 items-center">
-              <div className="w-36 h-36 transform hover:scale-110 transition-transform duration-500">
+            <div className="flex space-x-16 items-center">
+              <div className="w-44 h-48 transform hover:scale-110 transition-transform duration-500">
                 <CNC3DPart type="bracket" index={0} />
               </div>
-              <div className="w-32 h-40 transform hover:scale-110 transition-transform duration-500">
+              <div className="w-40 h-52 transform hover:scale-110 transition-transform duration-500">
                 <CNC3DPart type="cylinder" index={1} />
               </div>
-              <div className="w-36 h-36 transform hover:scale-110 transition-transform duration-500">
+              <div className="w-44 h-44 transform hover:scale-110 transition-transform duration-500">
                 <CNC3DPart type="bearing" index={2} />
               </div>
-              <div className="w-32 h-36 transform hover:scale-110 transition-transform duration-500">
+              <div className="w-40 h-48 transform hover:scale-110 transition-transform duration-500">
                 <CNC3DPart type="connector" index={3} />
               </div>
-              <div className="w-32 h-32 transform hover:scale-110 transition-transform duration-500">
+              <div className="w-40 h-40 transform hover:scale-110 transition-transform duration-500">
                 <CNC3DPart type="default" index={4} />
               </div>
             </div>
           </div>
 
-          {/* Additional floating parts for depth */}
+          {/* Additional Large Floating Parts for Enhanced 3D Effect */}
           <div 
-            className="absolute top-20 left-20 opacity-20"
-            style={{ transform: `translateY(${scrollY * 0.15}px) rotateZ(${scrollY * 0.1}deg)` }}
+            className="absolute top-10 left-10 opacity-35 z-10"
+            style={{ 
+              transform: isClient 
+                ? `translateY(${scrollY * 0.2}px) rotateZ(${scrollY * 0.15}deg)`
+                : 'translateY(0px) rotateZ(0deg)',
+              perspective: '800px'
+            }}
           >
-            <div className="w-20 h-20">
+            <div className="w-32 h-32">
               <CNC3DPart type="bearing" index={5} />
             </div>
           </div>
           <div 
-            className="absolute bottom-32 right-24 opacity-25"
-            style={{ transform: `translateY(${scrollY * -0.1}px) rotateZ(${scrollY * -0.05}deg)` }}
+            className="absolute bottom-20 right-16 opacity-40 z-10"
+            style={{ 
+              transform: isClient 
+                ? `translateY(${scrollY * -0.15}px) rotateZ(${scrollY * -0.1}deg)`
+                : 'translateY(0px) rotateZ(0deg)',
+              perspective: '800px'
+            }}
           >
-            <div className="w-24 h-24">
+            <div className="w-36 h-36">
               <CNC3DPart type="cylinder" index={6} />
             </div>
           </div>
           <div 
-            className="absolute top-40 right-32 opacity-15"
-            style={{ transform: `translateY(${scrollY * 0.25}px) rotateZ(${scrollY * 0.08}deg)` }}
+            className="absolute top-32 right-20 opacity-30 z-10"
+            style={{ 
+              transform: isClient 
+                ? `translateY(${scrollY * 0.25}px) rotateZ(${scrollY * 0.12}deg)`
+                : 'translateY(0px) rotateZ(0deg)',
+              perspective: '800px'
+            }}
           >
-            <div className="w-18 h-18">
+            <div className="w-28 h-28">
               <CNC3DPart type="bracket" index={7} />
+            </div>
+          </div>
+          <div 
+            className="absolute bottom-40 left-32 opacity-25 z-10"
+            style={{ 
+              transform: isClient 
+                ? `translateY(${scrollY * -0.2}px) rotateZ(${scrollY * -0.08}deg)`
+                : 'translateY(0px) rotateZ(0deg)',
+              perspective: '800px'
+            }}
+          >
+            <div className="w-32 h-40">
+              <CNC3DPart type="connector" index={8} />
             </div>
           </div>
 
           {/* Hero Content */}
-          <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="relative z-20 flex items-center justify-center min-h-screen">
             <div className="text-center max-w-6xl mx-auto px-6">
               {/* Main Headline */}
               <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8">
@@ -688,11 +765,11 @@ const ForgeManufacturingV2 = () => {
                 </div>
 
                 <blockquote className="text-gray-700 leading-relaxed text-lg mb-6">
-                  "At Forge, we believe that getting custom CNC parts should be fast, reliable, and effortless. That's why we built a fully streamlined platform that turns your CAD files into production-ready parts—delivered in as fast as one day."
+                  &quot;At Forge, we believe that getting custom CNC parts should be fast, reliable, and effortless. That&apos;s why we built a fully streamlined platform that turns your CAD files into production-ready parts—delivered in as fast as one day.&quot;
                 </blockquote>
 
                 <div className="text-sm text-gray-500 mb-8">
-                  "We operate high-performance CNC machines backed by in-house automation and a trusted network of suppliers. From one-off prototypes to small production runs, our system is built to deliver precise, high-quality parts with speed."
+                  &quot;We operate high-performance CNC machines backed by in-house automation and a trusted network of suppliers. From one-off prototypes to small production runs, our system is built to deliver precise, high-quality parts with speed.&quot;
                 </div>
 
                 {/* Enhanced 3D element in testimonial */}
@@ -885,12 +962,12 @@ const ForgeManufacturingV2 = () => {
 
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[
-                { name: '5-Axis CNC Milling', capability: 'Complex geometries', accuracy: '±0.001"', tool: 'mill' },
-                { name: 'Swiss Turning', capability: 'High precision parts', accuracy: '±0.0005"', tool: 'lathe' },
-                { name: 'Wire EDM', capability: 'Intricate profiles', accuracy: '±0.0002"', tool: 'mill' },
-                { name: 'Surface Grinding', capability: 'Ultra-smooth finishes', accuracy: '±0.00005"', tool: 'drill' },
-                { name: 'Laser Cutting', capability: 'Sheet metal work', accuracy: '±0.003"', tool: 'mill' },
-                { name: 'Quality Control', capability: 'CMM inspection', accuracy: '±0.0001"', tool: 'lathe' }
+                { name: '5-Axis CNC Milling', capability: 'Complex geometries', accuracy: '±0.001"', tool: 'mill' as const },
+                { name: 'Swiss Turning', capability: 'High precision parts', accuracy: '±0.0005"', tool: 'lathe' as const },
+                { name: 'Wire EDM', capability: 'Intricate profiles', accuracy: '±0.0002"', tool: 'mill' as const },
+                { name: 'Surface Grinding', capability: 'Ultra-smooth finishes', accuracy: '±0.00005"', tool: 'drill' as const },
+                { name: 'Laser Cutting', capability: 'Sheet metal work', accuracy: '±0.003"', tool: 'mill' as const },
+                { name: 'Quality Control', capability: 'CMM inspection', accuracy: '±0.0001"', tool: 'lathe' as const }
               ].map((tool, index) => (
                 <div key={index} className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-8 hover:shadow-lg transition-all duration-300">
                   <div className="h-32 bg-white rounded-xl mb-6 overflow-hidden">
@@ -988,7 +1065,7 @@ const ForgeManufacturingV2 = () => {
               Get in <span className="text-blue-200 italic font-light">Touch</span>
             </h2>
             <p className="text-xl mb-12 text-blue-100">
-              Ready to start your next manufacturing project? Let's discuss your requirements.
+              Ready to start your next manufacturing project? Let&apos;s discuss your requirements.
             </p>
 
             <div className="grid md:grid-cols-2 gap-12">
